@@ -1,7 +1,8 @@
 // lib/main.dart
-import 'package:ffmpeg_kit_flutter_new_min_gpl/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new_min_gpl/return_code.dart';
 
+
+import 'package:ffmpeg_kit_min_gpl/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_min_gpl/return_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screen_recording/flutter_screen_recording.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -99,8 +100,8 @@ class _ScreenRecorderPageState extends State<ScreenRecorderPage> {
     // create new output file path
     final outputPath = inputPath.replaceFirst('.mp4', '_denoised.mp4');
 
-    // Simple noise reduction filter with FFmpeg (tweak nf value as needed)
-    final cmd = "-y -i '$inputPath' -af afftdn=nf=-25 '$outputPath'";
+    // Use double quotes to be safe with spaces in paths
+    final cmd = '-y -i "$inputPath" -af afftdn=nf=-25 "$outputPath"';
 
     final session = await FFmpegKit.execute(cmd);
     final returnCode = await session.getReturnCode();
@@ -124,12 +125,12 @@ class _ScreenRecorderPageState extends State<ScreenRecorderPage> {
     try {
       // 1) Stop recording, get local path from flutter_screen_recording
       final path = await FlutterScreenRecording.stopRecordScreen;
-      final denoisedPath = await _denoiseVideo(path) ?? path;
+      // final denoisedPath = await _denoiseVideo(path) ?? path;
 
       // 2) Save that file into system gallery / Photos using gallery_saver_plus
       bool? saved;
       if (path.isNotEmpty) {
-        saved = await gallery_saver.GallerySaver.saveVideo(denoisedPath);
+        saved = await gallery_saver.GallerySaver.saveVideo(path);
       }
 
       setState(() {
